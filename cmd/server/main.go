@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os/exec"
+	"runtime"
 	"time"
 
 	"github.com/atotto/clipboard"
-	"github.com/go-vgo/robotgo"
 )
 
 const (
@@ -26,9 +27,9 @@ type Response struct {
 
 func main() {
 	addr := fmt.Sprintf("%s:%d", Host, Port)
-	
+
 	http.HandleFunc("/", handleRequest)
-	
+
 	log.Printf("Server started on http://%s", addr)
 	log.Println("Waiting for input...")
 
@@ -65,9 +66,29 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	robotgo.KeyTap("v", "ctrl")
-	log.Println("[Pasted] Text pasted successfully")
+	if err := simulatePaste(); err != nil {
+		log.Printf("[Warning] Paste failed: %v", err)
+	} else {
+		log.Println("[Pasted] Text pasted successfully")
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(Response{Status: "ok"})
+}
+
+func simulatePaste() error {
+	var cmd *exec.Cmd
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("powershell", "-Command", "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('^v')")
+	case "linux":
+		cmd = exec.Command("xdotool", "key", "ctrl+v")
+	case "darwin":
+		cmd = exec.Command("osascript", "-e", "tell application \"System Events\" to keystroke \"v\" using command down")
+	default:
+		return fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+	}
+
+	return cmd.Run()
 }
