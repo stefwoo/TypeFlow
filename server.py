@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-# /// job:
-#     depends: []
-#     runner: windows-latest
-#     uv: ["source", { chain: ["pip", "config", "set", "global.index-url", "https://pypi.tuna.tsinghua.edu.cn/simple"] }]
+# /// uv
+# dependencies = ["pyperclip", "pyautogui"]
 # ///
 
 """
