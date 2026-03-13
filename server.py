@@ -24,21 +24,22 @@ PORT = 9527
 
 class InputRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        html = """<html><body>
+        <h1>TypeFlow Server</h1>
+        <p>Status: Running</p>
+        <p>Only POST request supported</p>
+        <p>Send JSON: {"text": "content"}</p>
+        </body></html>"""
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
-        self.wfile.write(b"""<html><body>
-        <h1>TypeFlow Server</h1>
-        <p>Status: Running</p>
-        <p>仅支持 POST 请求</p>
-        <p>发送 JSON: {"text": "内容"}</p>
-        </body></html>""")
+        self.wfile.write(html.encode("utf-8"))
 
     def do_POST(self):
         print(f"[Request] {self.command} {self.path} from {self.client_address}")
         print(f"[Headers] {dict(self.headers)}")
-        
+
         try:
             content_length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_length).decode("utf-8")
