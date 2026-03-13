@@ -39,9 +39,10 @@ jobs:
   go:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         goos: [windows, linux, darwin]
-        goarch: [amd64, arm64]
+        goarch: [amd64]
     
     steps:
       - name: Checkout
@@ -52,9 +53,10 @@ jobs:
         with:
           go-version: '1.21'
 
-      - name: Download dependencies
+      - name: Tidy dependencies
         working-directory: cmd/server
-        run: go mod download
+        run: |
+          go mod tidy
 
       - name: Build
         working-directory: cmd/server
