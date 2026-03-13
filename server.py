@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # /// uv
-# dependencies = ["pyperclip", "pyautogui"]
+# dependencies = [
+#     "pyperclip",
+#     "pyautogui"
+# ]
 # ///
 
 """
