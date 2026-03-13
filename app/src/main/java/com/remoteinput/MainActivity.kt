@@ -111,6 +111,9 @@ fun RemoteInputApp() {
 suspend fun sendTextToPC(address: String, text: String): Boolean {
     return withContext(Dispatchers.IO) {
         try {
+            android.util.Log.d("TypeFlow", "Sending to: http://$address/")
+            android.util.Log.d("TypeFlow", "Text: ${text.take(50)}")
+            
             val fullUrl = "http://$address/"
             val url = URL(fullUrl)
             val conn = url.openConnection() as HttpURLConnection
@@ -119,21 +122,26 @@ suspend fun sendTextToPC(address: String, text: String): Boolean {
             conn.setRequestProperty("Accept", "application/json")
             conn.doOutput = true
             conn.doInput = true
-            conn.connectTimeout = 5000
-            conn.readTimeout = 5000
+            conn.connectTimeout = 10000
+            conn.readTimeout = 10000
 
             val jsonBody = """{"text": ${escapeJson(text)}}"""
+            android.util.Log.d("TypeFlow", "JSON: $jsonBody")
 
             conn.outputStream.use { outputStream ->
                 outputStream.write(jsonBody.toByteArray(Charsets.UTF_8))
             }
 
             val responseCode = conn.responseCode
+            val responseMessage = conn.responseMessage
+            android.util.Log.d("TypeFlow", "Response: $responseCode $responseMessage")
+            
             conn.disconnect()
 
             responseCode == 200
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("TypeFlow", "Error: ${e.message}", e)
+            android.util.Log.e("TypeFlow", "Exception: ${e.javaClass.name}")
             false
         }
     }
