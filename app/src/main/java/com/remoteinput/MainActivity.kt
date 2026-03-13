@@ -111,19 +111,22 @@ fun RemoteInputApp() {
 suspend fun sendTextToPC(address: String, text: String): Boolean {
     return withContext(Dispatchers.IO) {
         try {
-            val fullUrl = "http://$address"
+            val fullUrl = "http://$address/"
             val url = URL(fullUrl)
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
+            conn.setRequestProperty("Accept", "application/json")
             conn.doOutput = true
+            conn.doInput = true
+            conn.connectTimeout = 5000
+            conn.readTimeout = 5000
 
             val jsonBody = """{"text": ${escapeJson(text)}}"""
 
-            val outputStream: OutputStream = conn.outputStream
-            outputStream.write(jsonBody.toByteArray())
-            outputStream.flush()
-            outputStream.close()
+            conn.outputStream.use { outputStream ->
+                outputStream.write(jsonBody.toByteArray(Charsets.UTF_8))
+            }
 
             val responseCode = conn.responseCode
             conn.disconnect()
