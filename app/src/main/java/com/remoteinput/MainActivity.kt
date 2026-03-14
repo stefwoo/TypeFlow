@@ -1,9 +1,12 @@
 package com.remoteinput
 
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -11,6 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +46,8 @@ data class ServerConfig(
 fun RemoteInputApp() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val inputFieldRef = remember { View }
 
     var servers by remember {
         mutableStateOf(loadServers(context))
@@ -52,6 +59,14 @@ fun RemoteInputApp() {
     var isSending by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf("") }
     var showSettings by remember { mutableStateOf(false) }
+
+    // 启动时自动弹出输入法
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(300) // 稍微延迟确保 UI 渲染完成
+        inputFieldRef.requestFocus()
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(inputFieldRef, InputMethodManager.SHOW_IMPLICIT)
+    }
 
     Column(
         modifier = Modifier
@@ -66,7 +81,9 @@ fun RemoteInputApp() {
         ) {
             Text(
                 text = "TypeFlow",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
                 color = MaterialTheme.colorScheme.primary
             )
             
@@ -88,7 +105,7 @@ fun RemoteInputApp() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 大号输入框
+        // 大号输入框 - 带圆角
         OutlinedTextField(
             value = inputText,
             onValueChange = { inputText = it },
@@ -96,7 +113,8 @@ fun RemoteInputApp() {
                 .fillMaxWidth()
                 .weight(1f),
             placeholder = { Text("点击输入文字...") },
-            textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
+            textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
+            shape = RoundedCornerShape(16.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))

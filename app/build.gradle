@@ -20,6 +20,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            debuggable false
+        }
     }
 
     compileOptions {
@@ -37,6 +40,13 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.4'
+    }
+}
+
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        def outputFileName = "typeflow-${variant.name}.apk"
+        output.outputFileName = outputFileName
     }
 }
 
