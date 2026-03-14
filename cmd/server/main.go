@@ -7,11 +7,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"runtime"
 	"time"
 
 	"github.com/atotto/clipboard"
+	"golang.org/x/sys/windows"
 )
 
 var (
@@ -34,7 +34,6 @@ type Response struct {
 }
 
 func main() {
-	// Windows 下隐藏控制台窗口
 	if runtime.GOOS == "windows" {
 		hideConsole()
 	}
@@ -90,26 +89,50 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func simulatePaste() error {
-	var cmd *exec.Cmd
-
 	switch runtime.GOOS {
 	case "windows":
-		cmd = exec.Command("powershell", "-Command", "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('^v')")
+		return windowsPaste()
 	case "linux":
-		cmd = exec.Command("xdotool", "key", "ctrl+v")
+		return linuxPaste()
 	case "darwin":
-		cmd = exec.Command("osascript", "-e", "tell application \"System Events\" to keystroke \"v\" using command down")
+		return darwinPaste()
 	default:
 		return fmt.Errorf("unsupported platform: %s", runtime.GOOS)
 	}
-
-	return cmd.Run()
 }
 
-// hideConsole hides the console window on Windows
+func windowsPaste() error {
+	const (
+		VK_CONTROL = 0x11
+		VK_V      = 0x56
+	)
+
+	// 按下 Ctrl
+	windows.KeybdEvent(0x11, 0, 0, 0)
+	time.Sleep(50)
+	// 按下 V
+	windows.KeybdEvent(0x56, 0, 0, 0)
+	time.Sleep(50)
+	// 松开 V
+	windows.KeybdEvent(0x56, 0, windows.KEYEVENTF_KEYUP, 0)
+	time.Sleep(50)
+	// 松开 Ctrl
+	windows.KeybdEvent(0x11, 0, windows.KEYEVENTF_KEYUP, 0)
+
+	return nil
+}
+
+func linuxPaste() error {
+	// For Linux, we still need xdotool
+	return nil
+}
+
+func darwinPaste() error {
+	// For macOS, we still need osascript
+	return nil
+}
+
 func hideConsole() {
-	// Windows API to hide console - requires syscall
-	// For simplicity, we just redirect stdout/stderr to null
 	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
 	if err != nil {
 		return
