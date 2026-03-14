@@ -44,17 +44,26 @@
 ./typeflow-windows-amd64.exe --port 8080
 ```
 
-#### 开机自启动（Windows）
+#### 开机自启动（Windows，推荐任务计划程序）
 
-将 `typeflow-windows-amd64.exe` 复制到以下位置：
+**推荐：任务计划程序**（无 UAC 提示，一劳永逸）
 
-1. **方法一：Startup 文件夹**
-   - 按 `Win + R`，输入 `shell:startup`
-   - 将 exe 文件粘贴到打开的文件夹中
+1. 将 `typeflow-windows-amd64.exe` 放到合适位置（如 `C:\Program Files\TypeFlow\`）
+2. 打开「任务计划程序」(taskschd.msc)
+3. 创建基本任务：
+   - 名称：`TypeFlow`
+   - 触发器：选择「计算机启动」或「登录时」
+   - 操作：启动程序 → 选择 exe 文件
+4. 完成
 
-2. **方法二：任务计划程序**
-   - 打开「任务计划程序」
-   - 创建基本任务 → 设置开机触发 → 添加 exe 路径
+或者以管理员运行 CMD：
+```cmd
+schtasks /create /tn "TypeFlow" /tr "C:\Program Files\TypeFlow\typeflow.exe" /sc onlogon /rl limited
+```
+
+---
+
+**注意：不推荐使用 Startup 文件夹**，因为每次开机都会弹出 UAC 确认对话框。
 
 #### Python 版本（备选）
 
