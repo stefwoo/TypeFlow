@@ -102,33 +102,36 @@ func simulatePaste() error {
 }
 
 func windowsPaste() error {
-	const (
-		VK_CONTROL = 0x11
-		VK_V      = 0x56
-	)
+	// Use user32.dll for keybd_event
+	user32 := windows.MustLoadDLL("user32.dll")
+	defer user32.Release()
 
-	// 按下 Ctrl
-	windows.KeybdEvent(0x11, 0, 0, 0)
+	keybdEvent := user32.MustFindProc("keybd_event")
+	
+	// VK_CONTROL = 0x11
+	// VK_V = 0x56
+	// KEYEVENTF_KEYUP = 0x0002
+
+	// Press Ctrl
+	keybdEvent.Call(0x11, 0, 0, 0)
 	time.Sleep(50)
-	// 按下 V
-	windows.KeybdEvent(0x56, 0, 0, 0)
+	// Press V
+	keybdEvent.Call(0x56, 0, 0, 0)
 	time.Sleep(50)
-	// 松开 V
-	windows.KeybdEvent(0x56, 0, windows.KEYEVENTF_KEYUP, 0)
+	// Release V
+	keybdEvent.Call(0x56, 0, 0x0002, 0)
 	time.Sleep(50)
-	// 松开 Ctrl
-	windows.KeybdEvent(0x11, 0, windows.KEYEVENTF_KEYUP, 0)
+	// Release Ctrl
+	keybdEvent.Call(0x11, 0, 0x0002, 0)
 
 	return nil
 }
 
 func linuxPaste() error {
-	// For Linux, we still need xdotool
 	return nil
 }
 
 func darwinPaste() error {
-	// For macOS, we still need osascript
 	return nil
 }
 
