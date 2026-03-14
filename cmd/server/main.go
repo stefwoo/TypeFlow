@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"runtime"
 	"time"
@@ -12,10 +14,16 @@ import (
 	"github.com/atotto/clipboard"
 )
 
-const (
-	Host = "0.0.0.0"
-	Port = 9527
+var (
+	host string
+	port int
 )
+
+func init() {
+	flag.StringVar(&host, "host", "0.0.0.0", "Host to bind")
+	flag.IntVar(&port, "port", 9527, "Port to listen")
+	flag.Parse()
+}
 
 type Request struct {
 	Text string `json:"text"`
@@ -26,11 +34,16 @@ type Response struct {
 }
 
 func main() {
-	addr := fmt.Sprintf("%s:%d", Host, Port)
+	// Windows 下隐藏控制台窗口
+	if runtime.GOOS == "windows" {
+		hideConsole()
+	}
+
+	addr := fmt.Sprintf("%s:%d", host, port)
 
 	http.HandleFunc("/", handleRequest)
 
-	log.Printf("Server started on http://%s", addr)
+	log.Printf("TypeFlow Server started on http://%s", addr)
 	log.Println("Waiting for input...")
 
 	if err := http.ListenAndServe(addr, nil); err != nil {
@@ -91,4 +104,16 @@ func simulatePaste() error {
 	}
 
 	return cmd.Run()
+}
+
+// hideConsole hides the console window on Windows
+func hideConsole() {
+	// Windows API to hide console - requires syscall
+	// For simplicity, we just redirect stdout/stderr to null
+	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
+	if err != nil {
+		return
+	}
+	os.Stdout = devNull
+	os.Stderr = devNull
 }

@@ -28,61 +28,56 @@
 
 ### 1. PC 端配置
 
-#### 方式一：Go 版本（推荐，支持 Windows 服务）
-
 从 [Releases](https://github.com/stefwoo/TypeFlow/releases) 下载对应平台的二进制文件：
 
 - **Windows**: `typeflow-windows-amd64.exe`
 - **Linux**: `typeflow-linux-amd64`
 - **macOS**: `typeflow-darwin-amd64`
 
-直接运行：
+#### 启动方式
+
 ```bash
+# 默认端口 9527
 ./typeflow-windows-amd64.exe
+
+# 自定义端口
+./typeflow-windows-amd64.exe --port 8080
 ```
 
-服务默认监听 `0.0.0.0:9527`
+#### 开机自启动（Windows）
 
-#### 方式二：Python 版本
+将 `typeflow-windows-amd64.exe` 复制到以下位置：
+
+1. **方法一：Startup 文件夹**
+   - 按 `Win + R`，输入 `shell:startup`
+   - 将 exe 文件粘贴到打开的文件夹中
+
+2. **方法二：任务计划程序**
+   - 打开「任务计划程序」
+   - 创建基本任务 → 设置开机触发 → 添加 exe 路径
+
+#### Python 版本（备选）
 
 ```bash
 # 直接运行（自动安装依赖）
 uv run server.py
 ```
 
-### 2. 注册为 Windows 服务
-
-#### 方式一：使用 NSSM（推荐）
-
-1. 下载 [NSSM](https://nssm.cc/download)
-2. 将 `typeflow-windows-amd64.exe` 放到合适的位置（如 `C:\Program Files\TypeFlow\`）
-3. 以管理员身份打开 CMD：
-```cmd
-nssm install TypeFlow "C:\Program Files\TypeFlow\typeflow-windows-amd64.exe"
-nssm start TypeFlow
-```
-
-#### 方式二：使用 Go 内置服务（需要代码支持）
-
-> 注意：此方式需要重新编译，代码位于 `cmd/server/main.go`
-
-使用 `golang.org/x/sys/windows/svc` 可实现无第三方依赖的 Windows 服务。
-
-### 3. Android 端配置
+### 2. Android 端配置
 
 1. 从 [Releases](https://github.com/stefwoo/TypeFlow/releases) 下载 APK 并安装
-2. 打开 App，在顶部输入框配置 PC 的 IP 地址和端口
-   - 格式：`192.168.1.100:9527`
-   - IP 地址可通过 `ipconfig` (Windows) 或 `ifconfig` (Linux) 查看
-3. 在中间文本框输入或粘贴文字
-4. 点击底部「发送」按钮
+2. 打开 App，点击右上角 ⚙️ 设置按钮
+3. 添加服务器配置：
+   - 名称：如「办公室」、「家里」
+   - 地址：如 `192.168.1.100:9527`
+4. 可添加多台电脑，随时切换
 
-### 4. 使用流程
+### 3. 使用流程
 
-1. 在 PC 端打开目标输入框（记事本、浏览器搜索框等）
-2. 在手机端使用系统语音输入大段文字
-3. 点击发送，文字自动复制到剪贴板并在 PC 端上屏
-4. 手机端输入框自动清空，可继续输入下一段
+1. 确保 PC 端程序已运行（开机自启）
+2. 在手机端 TypeFlow App 中输入文字（可使用系统语音输入）
+3. 点击「发送」按钮
+4. 在 PC 端目标输入框中，文字自动粘贴上屏
 
 ## 项目结构
 
@@ -105,7 +100,7 @@ TypeFlow/
 ## 技术栈
 
 - **PC 端 (Python)**: Python + http.server + pyperclip + pyautogui
-- **PC 端 (Go)**: Go + atotto/clipboard + robotgo
+- **PC 端 (Go)**: Go + atotto/clipboard
 - **Android 端**: Kotlin + Jetpack Compose + Material 3
 - **构建**: GitHub Actions
 
