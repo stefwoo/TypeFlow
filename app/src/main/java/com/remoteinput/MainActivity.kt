@@ -58,7 +58,7 @@ fun RemoteInputApp() {
     var isSending by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf("") }
     var showSettings by remember { mutableStateOf(false) }
-    var textFieldFocusRequester by remember { FocusRequester() }
+    val textFieldFocusRequester = remember { FocusRequester() }
 
     // 启动时自动弹出输入法
     LaunchedEffect(Unit) {
