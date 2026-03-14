@@ -13,8 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,8 +47,6 @@ data class ServerConfig(
 fun RemoteInputApp() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val focusManager = LocalFocusManager.current
-    val inputFieldRef = remember { View }
 
     var servers by remember {
         mutableStateOf(loadServers(context))
@@ -59,13 +58,12 @@ fun RemoteInputApp() {
     var isSending by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf("") }
     var showSettings by remember { mutableStateOf(false) }
+    var textFieldFocusRequester by remember { FocusRequester() }
 
     // 启动时自动弹出输入法
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(300) // 稍微延迟确保 UI 渲染完成
-        inputFieldRef.requestFocus()
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(inputFieldRef, InputMethodManager.SHOW_IMPLICIT)
+        kotlinx.coroutines.delay(300)
+        textFieldFocusRequester.requestFocus()
     }
 
     Column(
@@ -111,7 +109,8 @@ fun RemoteInputApp() {
             onValueChange = { inputText = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .focusRequester(textFieldFocusRequester),
             placeholder = { Text("点击输入文字...") },
             textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
             shape = RoundedCornerShape(16.dp)
