@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func windowsPaste() error {
+func simulatePaste() error {
 	user32 := windows.MustLoadDLL("user32.dll")
 	defer user32.Release()
 
