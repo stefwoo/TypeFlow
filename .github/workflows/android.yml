@@ -131,17 +131,23 @@ jobs:
           cat release-notes.md
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v1.0
-          name: TypeFlow v1.0
-          draft: false
-          prerelease: false
-          body_path: release-notes.md
-          files: |
-            artifacts/typeflow-windows-amd64/typeflow-windows-amd64.exe
-            artifacts/typeflow-linux-amd64/typeflow-linux-amd64
-            artifacts/typeflow-darwin-amd64/typeflow-darwin-amd64
-            artifacts/typeflow-release/typeflow-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd artifacts
+          
+          # Rename files for release
+          cp typeflow-windows-amd64/typeflow-windows-amd64.exe ../typeflow-windows-amd64.exe
+          cp typeflow-linux-amd64/typeflow-linux-amd64 ../typeflow-linux-amd64
+          cp typeflow-darwin-amd64/typeflow-darwin-amd64 ../typeflow-darwin-amd64
+          cp typeflow-release/typeflow-release.apk ../typeflow-release.apk
+          cd ..
+          
+          # Create release with gh CLI
+          gh release create v1.0 \
+            --title "TypeFlow v1.0" \
+            --notes-file release-notes.md \
+            typeflow-windows-amd64.exe \
+            typeflow-linux-amd64 \
+            typeflow-darwin-amd64 \
+            typeflow-release.apk
