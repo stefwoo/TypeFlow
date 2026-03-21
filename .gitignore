@@ -1,0 +1,20 @@
+# Build outputs
+.gradle/
+app/build/
+build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Cache
+.ruff_cache/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+my-first-skill/

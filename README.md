@@ -116,3 +116,9 @@ TypeFlow/
 ## 许可证
 
 MIT
+
+## 赞助
+
+如果这个工具对你有帮助，欢迎扫码赞助：
+
+<img src="https://i.v2ex.co/3DK95d16.png" width="150" alt="赞助" />
