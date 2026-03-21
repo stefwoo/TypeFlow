@@ -112,16 +112,22 @@ jobs:
       - name: Generate Release Notes
         id: release-notes
         run: |
-          NOTES="## TypeFlow v1.0\n\n"
-          NOTES+="手机语音转电脑文字输入神器\n\n"
-          NOTES+="### 下载说明\n\n"
-          NOTES+="- Windows: 下载 `typeflow-windows-amd64.exe`\n"
-          NOTES+="- Linux: 下载 `typeflow-linux-amd64`\n"
-          NOTES+="- macOS: 下载 `typeflow-darwin-amd64`\n"
-          NOTES+="- Android: 下载 `typeflow-release.apk`\n\n"
-          NOTES+="### 更新内容\n\n"
-          NOTES+="- 首个正式版本\n"
-          echo "$NOTES" > release-notes.md
+          cat > release-notes.md << 'EOF'
+          ## TypeFlow v1.0
+
+          手机语音转电脑文字输入神器
+
+          ### 下载说明
+
+          - Windows: 下载 `typeflow-windows-amd64.exe`
+          - Linux: 下载 `typeflow-linux-amd64`
+          - macOS: 下载 `typeflow-darwin-amd64`
+          - Android: 下载 `typeflow-release.apk`
+
+          ### 更新内容
+
+          - 首个正式版本
+          EOF
           cat release-notes.md
 
       - name: Create Release
