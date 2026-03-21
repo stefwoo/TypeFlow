@@ -15,9 +15,19 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("${System.getProperty('user.home')}/.android/typeflow.keystore")
+            storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'TypeFlow123456'
+            keyAlias System.getenv('KEYSTORE_ALIAS') ?: 'typeflow'
+            keyPassword System.getenv('KEYSTORE_PASSWORD') ?: 'TypeFlow123456'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
